@@ -6,9 +6,11 @@ use App\Entity\Ad;
 use App\Form\AdType;
 use App\Repository\AdRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class AdController extends AbstractController
 {
@@ -28,6 +30,7 @@ class AdController extends AbstractController
      * permet de créer une  annonce
      * 
      * @Route("/ads/new", name="ads_create")
+     * @IsGranted("ROLE_USER")
      * 
      * @return Response
      */
@@ -66,6 +69,7 @@ class AdController extends AbstractController
      * permet d'afficher le formulaire d'édition d'une annonce
      * 
      * @Route("/ads/{slug}/edit", name="ads_edit")
+     * @Security("is_granted('ROLE_USER') and user === ad.getAuthor()", message="La modification d'une annonce n'est autorisée que par son auteur")
      * 
      * @return Response
      */
@@ -114,6 +118,31 @@ class AdController extends AbstractController
 
         return $this->render('ad/show.html.twig', [
             'ad' => $ad
+        ]);
+    }
+
+    /**
+     * Permet de supprimer une annonce et tous les enregistrements liés
+     * 
+     * @Route("/ads/{slug}/delete", name="ads_delete")
+     * @Security("is_granted('ROLE_USER') and user === ad.getAuthor()", message="Vous n'êtes pas autorisé à accéder à cette ressource")
+     * 
+     * @param Ad $ad 
+     * @param EntityManagerInterface $manager 
+     * @return Response
+     */
+    public function delete(Ad $ad, EntityManagerInterface $manager)
+    {
+        $manager->remove($ad);
+        $manager->flush();
+
+        $this->addFlash(
+            'success',
+            "L'annonce <strong>{$ad->getTitle()}</strong> a bien été supprimée"
+        );
+
+        return $this->redirectToRoute("user_show",[
+            'slug' => $this->getUser()->getSlug()
         ]);
     }
 

@@ -3,11 +3,12 @@
 namespace App\DataFixtures;
 
 use App\Entity\Ad;
-use App\Entity\Image;
+use Faker\Factory;
+use App\Entity\Role;
 use App\Entity\User;
+use App\Entity\Image;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\Persistence\ObjectManager;
-use Faker\Factory;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class AppFixtures extends Fixture
@@ -21,6 +22,23 @@ class AppFixtures extends Fixture
     public function load(ObjectManager $manager)
     {
         $faker = Factory::create('fr_FR');
+
+        $adminRole = new Role();
+        $adminRole->setTitle('ROLE_ADMIN');
+        $manager->persist($adminRole);
+
+        // Création d'un utilistateur Admin
+        $adminUser = new User();
+        $adminUser
+            ->setFirstName('Arnaud')
+            ->setLastName('FROUIN')
+            ->setEmail('arnaud.frouin@wanadoo.fr')
+            ->setHash($this->encoder->encodePassword($adminUser, 'carolles'))
+            ->setPicture('https://www.gravatar.com/avatar/da29808b3056028b0294e2ce47404dd3')
+            ->setIntroduction($faker->sentence())
+            ->setDescription('<p>' . join('</p><p>', $faker->paragraphs(2)) . '</p>')
+            ->addUserRole($adminRole);
+        $manager->persist($adminUser);
 
         // Gestion des utilisateurs
         $users = [];
@@ -46,7 +64,6 @@ class AppFixtures extends Fixture
             $manager->persist($user);
 
             $users[] = $user;
-
         }
 
 
@@ -57,7 +74,7 @@ class AppFixtures extends Fixture
             $coverImage = "https://picsum.photos/1000/300";
             $introduction = $faker->paragraph(2);
             $content = '<p>' . join('</p><p>', $faker->paragraphs(5)) . '</p>';
-            $author = $users[ mt_rand(0, count($users)-1) ];
+            $author = $users[mt_rand(0, count($users) - 1)];
 
             $ad = new Ad();
             $ad->setTitle($title)
