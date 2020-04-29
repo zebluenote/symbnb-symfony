@@ -46,22 +46,27 @@
                 </a>
             </div>
         </div>
+    
+        {% set a = ad.author %}
+        {% set pluriel = "" %}
+        {% if a.ads|length > 1 %}
+            {% set pluriel = "s" %}
+        {% endif %}
         <div class="col">
             <div class="row">
-                <div class="col-4">
-                    <img src="http://placehold.it/64x64" alt="Avatar de Joseph Dupont">
+                <div class="col-3">
+                    <a href="{{ path('user_show', {'slug': a.slug}) }}">
+                        <img src="{{a.picture}}" class="avatar avatar-medium" alt="Avatar de {{a.fullname}}" title="Avatar de {{a.fullname}}">
+                    </a>
                 </div>
                 <div class="col">
-                    <h3>Joseph Dupont</h3>
-                    <span class="badge badge-primary">3 annonces</span>
+                    <a href="{{ path('user_show', {'slug': a.slug}) }}">
+                        <h3>{{a.fullname}}</h3>
+                    </a>
+                    <span class="badge badge-primary">{{ a.ads|length }} annonce{{pluriel}}</span>
                 </div>
             </div>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Possimus, est quo fuga in fugiat veritatis iure
-                dolores? Velit, placeat voluptas?</p>
-            <p>Pariatur eum officiis voluptatem, consequuntur modi repudiandae velit non illum vel, optio sit. Quia
-                molestiae architecto deserunt sequi, sint accusamus.</p>
-            <p>Dicta ipsum dolores facilis neque ad? Unde inventore, corrupti qui quam quod assumenda soluta quo
-                expedita minus nam a? Molestias.</p>
+            {{ a.description | raw }}
         </div>
     </div>
 </div>
