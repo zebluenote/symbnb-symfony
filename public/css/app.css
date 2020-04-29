@@ -36,3 +36,41 @@ div.carousel-caption h5, div.carousel-caption p {
     max-width: 32px;
     max-height: 32px;
 }
+
+.error404 .page-header {
+	background-color: #fff;
+}
+
+.error404 .page-title {
+	line-height: 0.6;
+	margin: 0;
+	padding: 300px;
+	position: relative;
+	text-align: center;
+	width: auto;
+}
+
+.error404 .page-title:before {
+	color: #e8e5ce;
+	content: "\f423";
+	font-size: 964px;
+	line-height: 0.6;
+	overflow: hidden;
+	position: absolute;
+	left: 7px;
+	top: 28px;
+}
+
+.error404 .page-wrapper {
+	background-color: #e8e5ce;
+}
+
+.error404 .page-header,
+.error404 .page-content {
+	margin: 0 auto;
+	max-width: 1040px;
+	padding-bottom: 40px;
+	width: 100%;
+}
+
+

@@ -1,0 +1,17 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Erreur{% endblock %}
+
+{% block body %}
+
+<div class="container">
+    <h1>Erreur</h1>
+
+    <p class="my-5">Une erreur est survenue, nous sommes désolés de ne pas être en mesure d'afficher la page que vous souhaitiez atteindre.</p>
+
+    <a href="{{ path('homepage') }}" class="btn btn-primary">Retour à la page d'accueil</a>
+    <a href="{{ path('ads_index') }}" class="btn btn-success">Nos annonces</a>
+</div>
+
+{% endblock %}
+

@@ -1,0 +1,17 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Forbidden{% endblock %}
+
+{% block body %}
+
+<div class="container">
+    <h1>Accès interdit</h1>
+
+    <div class="alert alert-danger my-5 mx-5">Vous n'avez pas le droit d'accéder à cette ressource.</div>
+
+    <a href="{{ path('homepage') }}" class="btn btn-primary">Retour à la page d'accueil</a>
+    <a href="{{ path('ads_index') }}" class="btn btn-success">Nos annonces</a>
+</div>
+
+{% endblock %}
+
