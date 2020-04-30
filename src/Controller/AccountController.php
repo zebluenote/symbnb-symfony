@@ -9,6 +9,7 @@ use App\Form\RegistrationType;
 use App\Form\PasswordUpdateType;
 use Symfony\Component\Form\FormError;
 use Doctrine\ORM\EntityManagerInterface;
+use LogicException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -172,5 +173,17 @@ class AccountController extends AbstractController
         return $this->render('user/index.html.twig', [
             'user' => $this->getUser()
         ]);
+    }
+
+    /**
+     * Permet d'afficher la liste des réservations faites par l'utilisateur courant
+     * 
+     * @Route("/account/bookings", name="account_bookings")
+     * @return Response 
+     * @throws LogicException 
+     */
+    public function bookings()
+    {
+        return $this->render('account/bookings.html.twig');
     }
 }
