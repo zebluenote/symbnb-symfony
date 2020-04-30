@@ -5,26 +5,30 @@
 {% block body %}
 
 <div class="container">
-    <h1>Vos réservations</h1>
-    <div class="alert alert-info mt-3">Retrouvez ci-dessous vos réservations passées et à venir</div>
+    <h1 class="my-5">Vos réservations</h1>
 
-    {% for booking in app.user.bookings %}
-        {% set ad = booking.ad %}
-        <div class="row mt-5">
-            <div class="col-4">
-                <img src="{{ ad.coverImage }}?{{ ad.slug }}" alt="Photo de l'annonce {{ ad.title }}" class="img-fluid">
+    {% if app.user.bookings and app.user.bookings|length > 0 %}
+        <div class="alert alert-info mt-3">Retrouvez ci-dessous vos réservations passées et à venir</div>
+        {% for booking in app.user.bookings %}
+            {% set ad = booking.ad %}
+            <div class="row mt-5">
+                <div class="col-md-4">
+                    <img src="{{ ad.coverImage }}?{{ ad.slug }}" alt="Photo de l'annonce {{ ad.title }}" class="img-fluid">
+                </div>
+                <div class="col-md-8">
+                    <h4>{{ ad.title }}</h4>
+                    <p>
+                        Réservation <strong>n°{{ booking.id }}</strong>
+                        <br>
+                        Du {{ booking.startDate|date('d/m/Y') }} au {{ booking.endDate|date('d/m/Y') }} {{ booking.amount | number_format(2, ',', ' ') }}&euro;
+                    </p>
+                    <a href="{{ path('booking_show', {'id': booking.id}) }}" class="btn btn-info">Voir</a>
+                </div>
             </div>
-            <div class="col-8">
-                <h4>{{ ad.title }}</h4>
-                <p>
-                    Réservation <strong>n°{{ booking.id }}</strong>
-                    <br>
-                    Du {{ booking.startDate|date('d/m/Y') }} au {{ booking.endDate|date('d/m/Y') }} {{ booking.amount }}&euro;
-                </p>
-                <a href="{{ path('booking_show', {'id': booking.id}) }}" class="btn btn-info">Voir</a>
-            </div>
-        </div>
-    {% endfor %}
+        {% endfor %}
+    {% else %}
+        <div class="alert alert-warning my-5">A l'heure actuelle nous n'avons aucune réservation à votre nom.</div>
+    {% endif %}
 
 </div>
 

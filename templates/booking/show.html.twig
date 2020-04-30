@@ -8,7 +8,7 @@
 {% set author = ad.author %}
 
 <div class="container">
-    <h1 class="h2">Votre réservation n°{{ booking.id }}</h1>
+    <h1 class="h2 my-5">Votre réservation n°{{ booking.id }}</h1>
 
     {% if app.request.query.get('withAlert') %}
     <div class="alert alert-success">
@@ -36,9 +36,9 @@
                     <dt class="col-md-4">Nombre de nuits</dt>
                     <dd class="col-md-8">{{ booking.duration }}</dd>
                     <dt class="col-md-4">Montant total</dt>
-                    <dd class="col-md-8">{{ booking.amount }}&euro;</dd>
+                    <dd class="col-md-8">{{ booking.amount | number_format(2, ',', ' ')  }}&euro;</dd>
                     <dt class="col-md-4">Commentaire</dt>
-                    <dd class="col-md-8"><em>{{ booking.comment }}</em></dd>
+                    <dd class="col-md-8"><em>{{ booking.comment | default('Aucun commentaire') }}</em></dd>
                 </dl>
                 <hr>
                 <h2 class="h3 alert-heading">Votre hôte</h2>
@@ -62,6 +62,36 @@
                 <a href="{{ path('user_show', {'slug': author.slug}) }}" class="btn btn-primary">Plus d'infos sur
                     {{ author.firstName }}</a>
             </div>
+            <div class="alert alert-light">
+
+                {% if date() > date(booking.endDate) %}
+
+                    {#
+                        On vérifie s'il existe déjà ou pas un commentaire au nom de l'utilisateur courant
+                        en utilisant getCommentFromAuthor() de l'entité Add.php
+                        On récupère le commentaire ou null
+                    #}
+                    {% set comment = booking.ad.commentFromAuthor(app.user) %}
+                    {% if comment is not null %}
+                        <h2 class="alert-heading">Votre commentaire</h2>
+                        <blockquote>
+                            {{ comment.content }} <em>({{ comment.createdAt|date('d/m/Y') }})</em>
+                        </blockquote>
+                        <strong>Note : </strong>{% include 'partials/rating.html.twig' with {'rating': comment.rating} %}
+                    {% else %}
+                        <h2 class="alert-heading">Votre avis compte !</h2>
+                        {{ form_start(form) }}
+                            {{ form_widget(form) }}
+                            <button class="btn btn-success">Enregistrer</button>
+                        {{ form_end(form) }}
+                    {% endif %}
+
+                {% else %}
+                    <h2 class="alert-heading">Votre avis compte mais...</h2>
+                    <p>Vous ne pouvez pas noter cette annonce pendant la période de réservation.</p>
+                {% endif %}
+
+            </div>
         </div>
         <div class="col">
             <div class="alert alert-light">
@@ -69,7 +99,7 @@
                 <h4 class="h5">
                     <a href="{{ path('ads_show', {'slug': ad.slug}) }}">{{ ad.title }}</a>
                 </h4>
-                <img src="{{ ad.coverImage }}" alt="{{ ad.title }}" class="img-fluid">
+                <img src="{{ ad.coverImage }}?{{ ad.slug }}" alt="{{ ad.title }}" class="img-fluid">
                 {{ ad.content|raw }}
                 <a href="{{ path('ads_show', {'slug': ad.slug}) }}" class="btn btn-primary">Plus d'informations</a>
             </div>
