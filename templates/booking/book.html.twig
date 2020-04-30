@@ -1,0 +1,119 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Réservation pour l'annonce annonce {{ ad.title }} {% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" integrity="sha256-siyOpF/pBWUPgIcQi17TLBkjvNgNQArcmwJB8YvkAgg=" crossorigin="anonymous" />
+{% endblock %}
+
+{% block body %}
+<div class="container">
+
+    <h1 class="h2 mb-4">Réservez pour l'annonce<br><em>{{ ad.title }}</em></h1>
+
+    <p>
+        Vous êtes sur le point de réserver le logement de <strong>{{ ad.author.fullName }}</strong>. 
+        Dites-nous tout, nous nous occupons du reste !
+    </p>
+
+    {{ form_start(form) }}
+
+    <div class="alert alert-light">
+
+        <h2 class="h3">Commencez par nous indiquer les dates qui vous intéressent</h2>
+
+        <div class="row">
+            <div class="col">
+                {{ form_row(form.startDate) }}
+            </div>
+            <div class="col">
+                {{ form_row(form.endDate) }}
+            </div>
+        </div>
+
+        <div class="alert alert-warning">
+            <strong>Attention</strong>, le format de date utilisé ici n'est pas compatible avec le champ correspondant de l'entité Booking qui doit être un objet DateTime.
+            <br>
+            Ceci impose de passer par le DataTransformer de Symfony qui permet d'appliquer une transformation sur un champ d'un formulaire.
+        </div>
+
+        <h3 class="h5 mt-3">Montant de votre séjour : <span id="amount">...</span> &euro;</h3>
+        <span id="days">0</span> nuit(s) à {{ ad.price }}&euro;/nuit
+    
+        <h3 class="h5 mt-3">Vous avez un commentaire ?</h3>
+        {{ form_row(form.comment) }}
+    </div>
+
+        
+        <h2 class="h4 mt-4">Vous avez presque terminé !</h2>
+        <p>Vacances de rêve ? Voyage professionnel ? Nous sommes avec vous !</p>
+
+        <button type="submit" class="btn btn-success">Je réserve</button>
+
+    </div>
+
+    {{ form_end(form) }}
+
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js" integrity="sha256-bqVeqGdJ7h/lYPq6xrPv/YGzMEb6dNxlfiTUHSgRCp8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.fr.min.js" integrity="sha256-IRibTuqtDv2uUUN/0iTrhnrvvygNczxRRAbPgCbs+LE=" crossorigin="anonymous"></script>
+<script>
+
+    function calculateAmount(){
+
+        {#
+        // Les valeurs dans les champs dateStart et dateEnd étant des strings formattés d/m/yyyy
+        // il n'est pas possible de les utiliser tels quels avec new Date()
+        // Il est donc nécessaire de les reformatter.
+        // Sans plugin particulier on peut passer par des expressions régulières.
+        // On a : 18/09/2020
+        // On veut obtenir : 2020-09-18
+        // On doit utiliser l'expression régulière suivante : (\d+)\/(\d+)\/(\d{4})
+        // on récupèrera alors les valeurs voulues dans $1, $2, $3
+        #}
+
+        // console.log( $('#booking_startDate').val() );
+        // console.log( $('#booking_endDate').val() );
+        const startDate = new Date($('#booking_startDate').val().replace(/(\d+)\/(\d+)\/(\d{4})/, '$3-$2-$1'));
+        const endDate = new Date($('#booking_endDate').val().replace(/(\d+)\/(\d+)\/(\d{4})/, '$3-$2-$1'));
+        // console.log(startDate);
+        // console.log(endDate);
+
+        if (startDate && endDate && startDate < endDate) {
+            const DAY_MILS = 24 * 60 * 60 * 1000;
+            const interval = endDate.getTime() - startDate.getTime(); // en millisecondes
+            const days = interval / DAY_MILS;
+            const amount = days * {{ ad.price }};
+            $('#days').text(days);
+            $('#amount').text(amount.toLocaleString('fr-FR'));
+        }
+    }    
+    
+    $(document).ready(function(){
+
+        $('#booking_startDate, #booking_endDate').datepicker({
+            language: 'fr',
+            format : 'dd/mm/yyyy',
+            startDate: new Date(),
+            datesDisabled: [
+            {% for day in ad.notAvailableDays %}
+                "{{ day.format('d/m/Y') }}",
+            {% endfor %}
+            ]
+        });
+
+        $('#booking_startDate').datepicker().on('changeDate', function(e){
+            console.warn('dateStart has changed')
+            $('#booking_endDate').datepicker('setStartDate', e.date);
+        });
+
+        $('#booking_startDate, #booking_endDate').on('change', calculateAmount);
+
+    })
+</script>
+
+{% endblock %}

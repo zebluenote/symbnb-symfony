@@ -29,12 +29,12 @@ class Ad
      * @ORM\Column(type="integer")
      */
     private $id;
-    
+
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\Length(min=10, max=255, minMessage="Le titre doit faire au moins 10 caractères", maxMessage="Le titre ne doit pas dépasser 255 caractères")
      */
-     private $title;
+    private $title;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -89,9 +89,15 @@ class Ad
      */
     private $author;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Booking", mappedBy="ad")
+     */
+    private $bookings;
+
     public function __construct()
     {
         $this->images = new ArrayCollection();
+        $this->bookings = new ArrayCollection();
     }
 
     /**
@@ -104,10 +110,41 @@ class Ad
      */
     public function generateSlug()
     {
-        if(empty($this->slug)) {
+        if (empty($this->slug)) {
             $slugify = new Slugify();
             $this->slug = $slugify->slugify($this->title);
         }
+    }
+
+    /**
+     * Permet d'obtenir un tableau des jours d'indisponibilité du logement
+     * (tableau d'entités de type DateTime)
+     * 
+     * @return Array
+     */
+    public function getNotAvailableDays()
+    {
+        $notAvailableDays = [];
+
+        foreach ($this->bookings as $booking) {
+            // Calculer les jours qui se trouvent entre la date d'arrivée et la date de départ
+            $resultat = range(
+                $booking->getStartDate()->getTimestamp(),
+                $booking->getEndDate()->getTimestamp(),
+                24 * 60 * 60
+            );
+            // $resultat contient alors une liste des jours allant du début à la fin de la réservation courante exprimés en timestamp
+            // On va donc parcourir ce tableau en transformant les timestamps en objets DateTime
+            $days = array_map(function ($dayTimestamp) {
+                return new \DateTime(date('Y-m-d', $dayTimestamp));
+            }, $resultat);
+
+            // on merge ce tableau $days avec $notAvailableDays pour enrichir la liste de jours
+            $notAvailableDays = array_merge($notAvailableDays, $days);
+        }
+
+
+        return $notAvailableDays;
     }
 
     public function getId(): ?int
@@ -243,4 +280,34 @@ class Ad
         return $this;
     }
 
+    /**
+     * @return Collection|Booking[]
+     */
+    public function getBookings(): Collection
+    {
+        return $this->bookings;
+    }
+
+    public function addBooking(Booking $booking): self
+    {
+        if (!$this->bookings->contains($booking)) {
+            $this->bookings[] = $booking;
+            $booking->setAd($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBooking(Booking $booking): self
+    {
+        if ($this->bookings->contains($booking)) {
+            $this->bookings->removeElement($booking);
+            // set the owning side to null (unless already changed)
+            if ($booking->getAd() === $this) {
+                $booking->setAd(null);
+            }
+        }
+
+        return $this;
+    }
 }
