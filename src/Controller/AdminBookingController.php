@@ -2,35 +2,40 @@
 
 namespace App\Controller;
 
+use LogicException;
 use App\Entity\Booking;
 use App\Form\AdminBookingType;
+use App\Service\PaginationService;
 use App\Repository\BookingRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use LogicException;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class AdminBookingController extends AbstractController
 {
     /**
      * Permet d'afficher la liste des réservations
+     * On utilise le service de pagination PaginationService
      * 
-     * @Route("/admin/bookings", name="admin_bookings_index")
+     * @Route("/admin/bookings/{page<\d+>?1}", name="admin_bookings_index")
      * 
      * @param BookingRepository $repo 
      * @return Response 
      * @throws LogicException 
      */
-    public function index(BookingRepository $repo)
+    public function index(BookingRepository $repo, $page, PaginationService $pagination)
     {
-        $bookings = $repo->findAll();
+        $pagination
+            ->setEntityClass(Booking::class)
+            ->setPage($page)
+            ->setLimit(20)
+        ;
 
         return $this->render('admin/booking/index.html.twig', [
-            'controller_name' => 'AdminBookingController',
-            'bookings' => $bookings
+            'pagination' => $pagination
         ]);
     }
 

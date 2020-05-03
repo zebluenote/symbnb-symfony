@@ -6,6 +6,7 @@ use App\Entity\Ad;
 use LogicException;
 use App\Form\AdType;
 use App\Repository\AdRepository;
+use App\Service\PaginationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,12 +16,24 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class AdminAdController extends AbstractController
 {
     /**
-     * @Route("/admin/ads", name="admin_ads_index")
+     * @Route("/admin/ads/{page<\d+>?1}", name="admin_ads_index")
+     * C'est équivalent à la route ("/admin/ads/{page}", name="admin_ads_index", requirements={"page": "\d+"})
+     * qui obligerait à définir une valeur par défaut $page=1 dans la fonction index() comme ci-dessous
+     *    public function index(AdRepository $repo, $page = 1)
+     * 
+     * ATTENTION : il semblerait que la valeur par défaut de 1 ci-dessous ne soit pas prise en considération
+     * ce qui oblige à conserver $page=1 dans index()
      */
-    public function index(AdRepository $repo)
+    public function index(AdRepository $repo, $page, PaginationService $pagination)
     {
+        $pagination
+            ->setEntityClass(Ad::class)
+            ->setLimit(10)
+            ->setPage($page)
+        ;
+
         return $this->render('admin/ad/index.html.twig', [
-            'ads' => $repo->findAll()
+            'pagination' => $pagination
         ]);
     }
 
