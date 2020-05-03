@@ -149,7 +149,7 @@ class Ad
         }, 0);
 
         if ( count($this->comments) > 0 ) {
-            return round($sum/count($this->comments));
+            return $sum/count($this->comments);
         } 
         return 0;
     }
@@ -294,7 +294,6 @@ class Ad
 
     public function removeImage(Image $image): self
     {
-        dd($image);
         if ($this->images->contains($image)) {
             $this->images->removeElement($image);
             // set the owning side to null (unless already changed)

@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\PreUpdate;
 use Doctrine\ORM\Mapping\PrePersist;
 use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
 use Symfony\Component\Validator\Constraints\Type;
@@ -35,9 +36,17 @@ class Booking
     private $ad;
 
     /**
+     * 
+     * ATTENTION : présence du groupe de validation "Front"
+     * permet de gérer les règles de validation à appliquer 
+     * soit au moment du createForm dans le controller
+     * soit (préférable) au niveau de configureOptions() du formulaire BookingType
+     * Dans ce cas précis, un voyageur ne peut pas saisir une date dans le passé
+     * mais un admin doit pouvoir le faire
+     * 
      * @ORM\Column(type="datetime")
      * @Assert\Type("\DateTimeInterface")
-     * @Assert\GreaterThanOrEqual("today", message="Impossible de débuter une réservation dans le passé")
+     * @Assert\GreaterThanOrEqual("today", message="Impossible de débuter une réservation dans le passé", groups={"Front"})
      */
     private $startDate;
 
@@ -69,6 +78,7 @@ class Booking
      * Callback appelé chaque fois que l'on crée une réservation
      * 
      * @ORM\PrePersist
+     * @ORM\PreUpdate
      * 
      * @return void 
      */
