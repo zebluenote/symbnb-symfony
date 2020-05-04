@@ -8,9 +8,11 @@
         <meta name="viewport" content="width=device-width, user-scalable=no">
 
         <link rel="shortcut icon" href="/favicon.ico">
-        <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+        {{ encore_entry_link_tags('css/app') }}
+
         <script src="https://kit.fontawesome.com/92d6f122cc.js" crossorigin="anonymous"></script>
-        <link rel="stylesheet" href="/css/app.css">
+
         {% block stylesheets %}{% endblock %}
     </head>
 
@@ -22,9 +24,8 @@
 
         {% include "admin/partials/footer.html.twig" %}
 
-        <script src="/js/jquery.min.js"></script>
-        <script src="/js/popper.min.js"></script>
-        <script src="/js/bootstrap.min.js"></script>
+        {{ encore_entry_script_tags('js/app') }}
+
         {% block javascripts %}{% endblock %}
     </body>
 
