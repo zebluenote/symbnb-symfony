@@ -2,7 +2,7 @@ a:hover {
     text-decoration: none;
 }
 
-div.container {
+div.container, div.container-fluid {
     margin-top: 20px;
 }
 

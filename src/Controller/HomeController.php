@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Repository\AdRepository;
+use App\Repository\UserRepository;
 use LogicException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,14 +32,13 @@ class HomeController extends AbstractController
      * @return Response 
      * @throws LogicException 
      */
-    public function home()
+    public function home(AdRepository $adRepo, UserRepository $userRepo)
     {
-        $tableau = ["Arnaud" => 61, "Alexandre" => 27, "Cyrille" => 24];
         return $this->render(
             'home.html.twig', 
             [
-                'title' => 'Bienvenue dans mon application',
-                'tableau' => $tableau
+                'ads' => $adRepo->findBestAds(3),
+                'users' => $userRepo->findBestUsers(2)
             ]
         );
     }
