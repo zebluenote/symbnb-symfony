@@ -1,11 +1,16 @@
 {
     "devDependencies": {
         "@symfony/webpack-encore": "^0.29.0",
-        "bootstrap": "^4.4.1",
+        "child_process": "^1.0.2",
         "core-js": "^3.0.0",
-        "jquery": "^3.5.0",
+        "fs": "0.0.1-security",
+        "jquery": "^3.5.1",
+        "net": "^1.0.2",
         "popper.js": "^1.16.1",
         "regenerator-runtime": "^0.13.2",
+        "rijs": "^0.9.1",
+        "rijs.npm": "^2.0.0",
+        "tls": "0.0.1",
         "webpack-notifier": "^1.6.0"
     },
     "license": "UNLICENSED",

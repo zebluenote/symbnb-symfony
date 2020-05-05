@@ -2,4 +2,5 @@ var $ = require('jquery');
 
 global.$ = global.jQuery = $;
 
-require('bootstrap');
+require('./popper.min.js');
+require('./bootstrap.min.js');

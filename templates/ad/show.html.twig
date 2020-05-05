@@ -1,8 +1,6 @@
 {% extends "base.html.twig" %}
 
-{% block title %}
-{{ ad.title }}
-{% endblock %}
+{% block title %}{{ ad.title }}{% endblock %}
 
 {% block body %}
 <div class="ad-title" style="background-image: url({{ad.coverImage}})">
@@ -97,8 +95,8 @@
                 <div class="col">
                     <a href="{{ path('user_show', {'slug': a.slug}) }}">
                         <h3>{{a.fullname}}</h3>
+                        <span class="badge badge-primary">{{ a.ads|length }} annonce{{pluriel}}</span>
                     </a>
-                    <span class="badge badge-primary">{{ a.ads|length }} annonce{{pluriel}}</span>
                 </div>
             </div>
             {{ a.description | raw }}
